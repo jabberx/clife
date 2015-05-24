@@ -8,8 +8,8 @@
 #include <math.h>
 #include <SDL/SDL.h>
 
-#define width 80
-#define SCAL 8
+#define width 300
+#define SCAL 2
 #define BIRTHRULE (nn == 3 || nn == 6)
 
 SDL_Surface *sdl_scr;
@@ -74,8 +74,7 @@ int main(int argc, char **argv)
 		if (dt<16) { SDL_Delay(16 - dt); dt = 16; }
         unsigned char *key = SDL_GetKeyState(NULL);
         if (key[SDLK_ESCAPE]) return;
-        if (key[SDLK_SPACE]) playing = 1;
-		if (key[SDLK_x]) playing = 0;
+        if (key[SDLK_SPACE]) { playing = !playing; SDL_Delay(250); }
 		if (key[SDLK_KP_PLUS]) stepms++;
 		if (key[SDLK_KP_MINUS]) stepms--;
 		if (!leftdn & key[SDLK_RIGHT]) { life(); leftdn = 1; }
@@ -84,6 +83,12 @@ int main(int argc, char **argv)
 		if (key[SDLK_r]) {
 			int x;
 			for (x = 0; x < width*width; x++) { map[x] = _rand() > 32767/2 ? 1 : 0; }
+			SDL_Delay(250);
+		}
+		
+		if (key[SDLK_z]) {
+			int x;
+			for (x = 0; x < width*width; x++) { map[x] = _rand() > 32767/2 ? map[x] : (_rand() < 32767/8 ? 1 : 0); }
 			SDL_Delay(250);
 		}
 		
@@ -122,6 +127,6 @@ int main(int argc, char **argv)
         memcpy(sdl_scr->pixels, scr, width*width*SCAL*SCAL*4);
         if(SDL_MUSTLOCK(sdl_scr)) SDL_UnlockSurface(sdl_scr); 
         SDL_Flip(sdl_scr);
-        char buf[256]; sprintf(buf, "+/-:step(%d), space/x:run/stop, esc:exit", stepms, 1000/dt); SDL_WM_SetCaption(buf, NULL);
+        char buf[256]; sprintf(buf, "+/-:step(%d), space:play/stop, esc:exit, z/r/e - cells", stepms, 1000/dt); SDL_WM_SetCaption(buf, NULL);
     }
 }
